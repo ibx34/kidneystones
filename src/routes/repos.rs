@@ -15,6 +15,7 @@ use axum::{
     routing::{get, post},
     TypedHeader,
 };
+use chrono::Utc;
 use futures_util::StreamExt;
 use git2::{Repository, Status};
 use reqwest::StatusCode;
@@ -29,10 +30,12 @@ pub struct CreateRepoData {
     // And when unauthorized, it's put under ghost. For now, while there arent users, then this field should
     // be touched
     pub owner: Option<String>,
+    // Should be x time from the current UNIX Epoch
     pub ttl: Option<i64>,
     pub private: bool,
 }
 
+// https://docs.rs/cron/0.12.0/cron/
 pub async fn create_repo(
     State(app): State<App>,
     // This will be needed later:tm:
@@ -49,6 +52,11 @@ pub async fn create_repo(
     } else {
         // The user is creating an anonymous repo. Some of the checks can be done here!
         if create_repo_data.private || create_repo_data.ttl.is_none() {
+            return (StatusCode::FORBIDDEN, json!({}).to_string()).into_response();
+        }
+        let ttl = create_repo_data.ttl.unwrap();
+        let now = Utc::now().timestamp();
+        if ttl < now {
             return (StatusCode::FORBIDDEN, json!({}).to_string()).into_response();
         }
         (
