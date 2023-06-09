@@ -55,6 +55,10 @@ async fn main() -> Result<()> {
     let web_routes = register_web_routes();
     let app = Router::new()
         .nest_service(
+            "/assets",
+            get_service(ServeDir::new("/home/alfredo/kidney-stones/assets")),
+        )
+        .nest_service(
             "/dist",
             get_service(ServeDir::new("/home/alfredo/kidney-stones/web/dist/")),
         )

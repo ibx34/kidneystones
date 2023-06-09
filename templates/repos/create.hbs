@@ -3,7 +3,7 @@
 <div class="w-full h-full flex flex-col gap-4 p-5 max-w-3xl">
     <header class="flex flex-col gap-4">
         <h1 class="font-['Be_vietnam_pro'] text-3xl font-semibold">Create Repo</h1>
-        {{#unless nested.user_is_logged_in}}
+        {{#unless user_is_logged_in}}
         <div class="p-5 bg-red-100 border-2 border-red-500 border-l-8 flex flex-col gap-2 shadow-sm">
             <h5 class="text-red-500 font-semibold text-lg">You're not logged in.</h5>
             <p>Repos created whilst not logged in are greatly limited in what they can do. You can push to them, and use
@@ -25,30 +25,36 @@
         {{/unless}}
     </header>
 
-    <form class="w-full h-full flex flex-col gap-4 max-w-3xl" action="/api/repos/create" method="POST">
-        <ul class="flex flex-row gap-2">
-            <input placeholder="owner" type="text" value="{{nested.defaults.owner}}" disabled="true"
-                class="font-sans w-full text-md px-2 p-[0.3rem] border border-transparent focus:border-blue-500 outline-none disabled:cursor-not-allowed disabled:text-gray-500 ring-1 ring-gray-500 focus:ring-blue-500" />
-            <input placeholder="name" type="text"
+    <form class="w-full h-full flex flex-col gap-4 max-w-3xl" action="" target="_self" method="post"
+        onsubmit="kidneyStones.submitCreateRepoForm(event, {{user_is_logged_in}})">
+        <ul class="flex flex-row items-end gap-2">
+            <h1 class="items-end text-2xl font-semibold text-gray-500">{{nested.owner}}</h1>
+            <span>/</span>
+            <input placeholder="name" id="new-repo-name" name="new-repo-name" type="text"
                 class="font-sans w-full text-md px-2 py-[0.3rem] border border-transparent focus:border-blue-500 outline-none disabled:cursor-not-allowed disabled:text-gray-500 ring-1 ring-gray-500 focus:ring-blue-500" />
         </ul>
 
+        {{!--
+        descriptions dont exist yet
         <textarea placeholder="Describe this repo"
             class="font-sans w-full text-md px-2 py-[0.3rem] border border-transparent focus:border-blue-500 outline-none disabled:cursor-not-allowed disabled:text-gray-500 ring-1 ring-gray-500 focus:ring-blue-500"></textarea>
+        --}}
 
-        {{#if nested.user_is_logged_in}}
+        {{#if user_is_logged_in}}
         <div class="flex flex-row gap-2 text-sm items-center max-w-md">
-            <input type="checkbox" />
+            <input id="new-repo-is-private" name="new-repo-is-private" type="checkbox" />
             <p>Make this repository private</p>
         </div>
         {{/if}}
+        {{#unless user_is_logged_in}}
         <div class="flex flex-row gap-2 text-sm items-center max-w-md">
-            <input type="checkbox" />
+            <input id="not-logged-in-user-agreement" name="not-logged-in-user-agreement" type="checkbox" />
             <p>By creating this repo you agree to our anonymous repository policy, terms of service and privacy policy.
             </p>
         </div>
+        {{/unless}}
 
-        <button type="submit"
+        <button
             class="font-sans max-w-max tracking-wide text-md bg-blue-500 text-white px-3 py-[0.3rem] transition-all duration-100 hover:bg-blue-400 active:bg-blue-300 active:text-black focus:bg-blue-400 focus:shadow-inner">Create
             Repo</button>
     </form>

@@ -1,6 +1,6 @@
 <nav class="w-screen flex flex-row justify-between items-center p-3 border-b border-black shadow-md">
-    <h1 class="text-2xl font-semibold
-    ">ibxg.it</h1>
+    <a href="/" class="text-2xl font-semibold
+    ">ibxg.it</a>
     <ul class="flex flex-row gap-2">
         <a href="/repos/create"
             class="font-sans tracking-wide text-sm bg-blue-500 text-white px-2 py-1 transition-all duration-100 hover:bg-blue-400 active:bg-blue-300 focus:shadow-inner">Create
@@ -9,7 +9,12 @@
         <button
             class="font-sans tracking-wide text-sm bg-blue-500 text-white px-2 py-1 transition-all duration-100 hover:bg-blue-400 active:bg-blue-300 focus:shadow-inner">Signup</button>
         {{/if}}
+        {{#if user_is_logged_in}}
+        <button
+            class="font-sans tracking-wide text-sm bg-blue-500 text-white px-2 py-1 transition-all duration-100 hover:bg-blue-400 active:bg-blue-300 focus:shadow-inner">profile</button>
+        {{else}}
         <button
             class="font-sans tracking-wide text-sm bg-blue-500 text-white px-2 py-1 transition-all duration-100 hover:bg-blue-400 active:bg-blue-300 focus:shadow-inner">Login</button>
+        {{/if}}
     </ul>
 </nav>
