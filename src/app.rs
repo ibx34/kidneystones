@@ -11,10 +11,13 @@ use crate::{
     models::{Accounts, Repos, Sessions},
 };
 use anyhow::Result;
+use axum_template::engine::Engine;
+use handlebars::Handlebars;
 
 #[derive(Clone)]
 pub struct App {
     pub db: Database,
+    pub hbs: Engine<Handlebars<'static>>,
     pub ids: Arc<Mutex<SnowflakeIdBucket>>,
 }
 
@@ -23,8 +26,28 @@ impl App {
         let database = Database::new(&CONFIG.database_uri).await.unwrap();
         database.migrate().await.unwrap();
 
+        let mut hbs = Handlebars::new();
+        hbs.register_template_file("home", "/home/alfredo/kidney-stones/templates/home.hbs")?;
+        hbs.register_template_file(
+            "repos/create",
+            "/home/alfredo/kidney-stones/templates/repos/create.hbs",
+        )?;
+        hbs.register_partial(
+            "html_head",
+            &std::fs::read_to_string("/home/alfredo/kidney-stones/templates/head.hbs")?,
+        )?;
+        hbs.register_partial(
+            "html_tail",
+            &std::fs::read_to_string("/home/alfredo/kidney-stones/templates/tail.hbs")?,
+        )?;
+        hbs.register_partial(
+            "nav",
+            &std::fs::read_to_string("/home/alfredo/kidney-stones/templates/nav.hbs")?,
+        )?;
+
         Ok(Self {
             db: database,
+            hbs: Engine::from(hbs),
             ids: Arc::new(Mutex::new(SnowflakeIdBucket::new(1, 1))),
         })
     }

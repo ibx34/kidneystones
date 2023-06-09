@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: normal;
+    font-weight: 400;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-Regular.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: italic;
+    font-weight: 400;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-Italic.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: normal;
+    font-weight: 100;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-Thin.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: italic;
+    font-weight: 100;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-ThinItalic.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: normal;
+    font-weight: 200;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-ExtraLight.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: italic;
+    font-weight: 200;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-ExtraLightItalic.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: normal;
+    font-weight: 300;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-Light.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: italic;
+    font-weight: 300;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-LightItalic.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: normal;
+    font-weight: 500;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-Medium.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: italic;
+    font-weight: 500;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-MediumItalic.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: normal;
+    font-weight: 600;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-SemiBold.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: italic;
+    font-weight: 600;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-SemiBoldItalic.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: normal;
+    font-weight: 700;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-Bold.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: italic;
+    font-weight: 700;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-BoldItalic.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: normal;
+    font-weight: 800;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-ExtraBold.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: italic;
+    font-weight: 800;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-ExtraBoldItalic.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: normal;
+    font-weight: 900;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-Black.woff) format('woff')
+}
+
+@font-face {
+    font-family: be vietnam pro;
+    font-style: italic;
+    font-weight: 900;
+    src: local('Be Vietnam Pro'), url(https://fonts.cdnfonts.com/s/93361/BeVietnamPro-BlackItalic.woff) format('woff')
+}

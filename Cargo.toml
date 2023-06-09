@@ -14,6 +14,7 @@ axum = { version = "0.6.18", features = [
     "headers",
     "multipart",
     "ws",
+    "macros",
 ] }
 sqlx = { version = "0.6.2", features = [
     "postgres",
@@ -64,7 +65,10 @@ libflate = "1.2.0"
 futures-util = "0.3.21"
 argon2 = "0.4.1"
 rand_core = { version = "0.6", features = ["std"] }
-tower-http = { version = "0.4.0", features = ["trace"] }
+tower-http = { version = "0.4.0", features = ["trace", "fs"] }
 rs-snowflake = "0.6.0"
 toml = "0.5.9"
 once_cell = "1.16.0"
+axum-extra = { version = "0.7.4", features = ["async-read-body"] }
+axum-template = { version = "0.18.0", features = ["handlebars"] }
+handlebars = "4.3.7"

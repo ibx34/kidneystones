@@ -1,0 +1,57 @@
+{{>html_head}}
+
+<div class="w-full h-full flex flex-col gap-4 p-5 max-w-3xl">
+    <header class="flex flex-col gap-4">
+        <h1 class="font-['Be_vietnam_pro'] text-3xl font-semibold">Create Repo</h1>
+        {{#unless nested.user_is_logged_in}}
+        <div class="p-5 bg-red-100 border-2 border-red-500 border-l-8 flex flex-col gap-2 shadow-sm">
+            <h5 class="text-red-500 font-semibold text-lg">You're not logged in.</h5>
+            <p>Repos created whilst not logged in are greatly limited in what they can do. You can push to them, and use
+                them as a normal git repo but may not edit any information (such as the name, description, owner,
+                visibility, etc.) If you'd like total control over YOUR repo we recommend logging in</p>
+            <p><strong>After creation</strong>, you'll be given a token. This token is what will allow you to perform
+                git actions on this repo. Keep it secret and share it with people you'd like to have access. The repo
+                will be publically available, anyone will be able to see it on the site. <strong>DO NOT USE THIS FOR
+                    SECRET PROJECTS</strong></p>
+            <ul class="flex flex-row gap-2">
+                {{#if signups_allowed}}
+                <button
+                    class="font-sans tracking-wide text-md bg-gray-500 text-white px-3 py-1 transition-all duration-100 hover:bg-gray-400 active:bg-gray-300 active:text-black focus:text-black focus:bg-gray-300 focus:shadow-inner">Signup</button>
+                {{/if}}
+                <button
+                    class="font-sans tracking-wide text-md bg-gray-500 text-white px-3 py-1 transition-all duration-100 hover:bg-gray-400 active:bg-gray-300 active:text-black focus:text-black focus:bg-gray-300 focus:shadow-inner">Login</button>
+            </ul>
+        </div>
+        {{/unless}}
+    </header>
+
+    <form class="w-full h-full flex flex-col gap-4 max-w-3xl" action="/api/repos/create" method="POST">
+        <ul class="flex flex-row gap-2">
+            <input placeholder="owner" type="text" value="{{nested.defaults.owner}}" disabled="true"
+                class="font-sans w-full text-md px-2 p-[0.3rem] border border-transparent focus:border-blue-500 outline-none disabled:cursor-not-allowed disabled:text-gray-500 ring-1 ring-gray-500 focus:ring-blue-500" />
+            <input placeholder="name" type="text"
+                class="font-sans w-full text-md px-2 py-[0.3rem] border border-transparent focus:border-blue-500 outline-none disabled:cursor-not-allowed disabled:text-gray-500 ring-1 ring-gray-500 focus:ring-blue-500" />
+        </ul>
+
+        <textarea placeholder="Describe this repo"
+            class="font-sans w-full text-md px-2 py-[0.3rem] border border-transparent focus:border-blue-500 outline-none disabled:cursor-not-allowed disabled:text-gray-500 ring-1 ring-gray-500 focus:ring-blue-500"></textarea>
+
+        {{#if nested.user_is_logged_in}}
+        <div class="flex flex-row gap-2 text-sm items-center max-w-md">
+            <input type="checkbox" />
+            <p>Make this repository private</p>
+        </div>
+        {{/if}}
+        <div class="flex flex-row gap-2 text-sm items-center max-w-md">
+            <input type="checkbox" />
+            <p>By creating this repo you agree to our anonymous repository policy, terms of service and privacy policy.
+            </p>
+        </div>
+
+        <button type="submit"
+            class="font-sans max-w-max tracking-wide text-md bg-blue-500 text-white px-3 py-[0.3rem] transition-all duration-100 hover:bg-blue-400 active:bg-blue-300 active:text-black focus:bg-blue-400 focus:shadow-inner">Create
+            Repo</button>
+    </form>
+</div>
+
+{{>html_tail}}
