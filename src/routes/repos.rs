@@ -77,8 +77,9 @@ pub async fn create_repo(
     if Repository::init_bare(bare_git_repo_path).is_err() {
         return (StatusCode::INTERNAL_SERVER_ERROR, json!({}).to_string()).into_response();
     }
-    app.create_repo(&stripped_repo_name, owner.1, &owner.0)
+    let new_repo = app
+        .create_repo(&stripped_repo_name, owner.1, &owner.0)
         .await
         .unwrap();
-    (StatusCode::OK, json!({}).to_string()).into_response()
+    (StatusCode::OK, serde_json::to_string(&new_repo).unwrap()).into_response()
 }

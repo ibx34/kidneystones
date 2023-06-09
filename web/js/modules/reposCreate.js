@@ -1,21 +1,3 @@
-/*
-
-let verify_captcha = await fetch('https://yiffing.yiff.day/api/captcha', {
-method: 'post',
-body: JSON.stringify({
-    "token": token
-}),
-headers: { 'Content-Type': 'application/json' }
-});
-switch (verify_captcha.status) {
-case 200:
-    setCaptchaVerified(!captchaVerified);
-    break
-}
-}}
-
-*/
-
 export function submitCreateRepoForm(event, logged_in) {
     const create_repo_form_data = new FormData(event.target);
     let new_repo_name = create_repo_form_data.get("new-repo-name");
@@ -30,15 +12,25 @@ export function submitCreateRepoForm(event, logged_in) {
         event.preventDefault();
         return;
     }
-    let new_form_object = {
-        name: new_repo_name,
-        private: create_repo_form_data.get("new-repo-is-private") === null ? false : create_repo_form_data.get("new-repo-is-private") == "on",
-    };
+
     if (!logged_in && create_repo_form_data.get("not-logged-in-user-agreement") === null) {
         alert(`You must agree to the Terms of Service, Privacy Policy and Anonymous Repository policy before creating a new repo.`);
         event.preventDefault();
         return;
     }
+    let new_form_object = {
+        name: new_repo_name,
+        private: create_repo_form_data.get("new-repo-is-private") === null ? false : create_repo_form_data.get("new-repo-is-private") == "on",
+    };
     alert(JSON.stringify(new_form_object));
+    fetch('/api/repos/create', {
+        method: 'post',
+        body: JSON.stringify(new_form_object),
+        headers: { 'Content-Type': 'application/json' }
+    }).catch((err) => {
+        alert(`Failed to create repo: ${err.body}`)
+    }).then((res) => {
+        alert(`New repo: ${JSON.stringify(res.json)}`)
+    });
     event.preventDefault();
 }
