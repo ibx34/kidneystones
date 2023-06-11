@@ -1,0 +1,28 @@
+{{>html_head}}
+<script>
+
+</script>
+
+<div class="w-full h-full flex flex-col gap-4 p-5 max-w-3xl">
+    <header class="flex flex-col gap-4">
+        <div class="flex flex-row gap-2 items-end">
+            <h1 class="font-['Be_vietnam_pro'] text-3xl font-semibold">{{nested.owner.name}}/{{nested.name}}</h1>
+            <button id="repos-view-copy-repo-id" onclick="kidneyStones.copyTextToClipboard(event, '{{nested.id}}')"
+                class="font-sans tracking-wide text-md underline decoration-dotted hover:decoration-solid!">copy
+                id</button>
+        </div>
+        <ul class="flex flex-row gap-2 border-b border-b-gray-500">
+            <a href="{{nested.repo_link}}" class="tab active">Code</a>
+            <a href="{{nested.repo_link}}/issues" class="tab">Issues</a>
+        </ul>
+    </header>
+    <div class="w-full flex flex-col gap-2 bg-gray-200 text-black rounded-3xl p-3">
+        <ul class="w-full flex flex-col divide-y divide-gray-300">
+            {{#each nested.tree}}
+            <a href="/" class="px-3 py-1 hover:text-blue-500">{{this.filename}}</a>
+            {{/each}}
+        </ul>
+    </div>
+</div>
+
+{{>html_tail}}

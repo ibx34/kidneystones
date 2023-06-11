@@ -1,6 +1,6 @@
 use std::{io::Bytes, net::SocketAddr, path::Path, process::Stdio};
 
-use crate::{app::App, config::CONFIG};
+use crate::{app::App, config::CONFIG, models::RepoFile};
 
 use super::git::strip_dot_git_from_repo_name;
 use axum::{
@@ -17,11 +17,35 @@ use axum::{
 };
 use chrono::Utc;
 use futures_util::StreamExt;
-use git2::{Repository, Status};
+use git2::{BranchType::Local, ObjectType::Commit, Oid, Repository};
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tokio::{io::AsyncWriteExt, process::Command};
+
+pub async fn get_repo_tree(
+    State(app): State<App>,
+    // This will be needed later:tm:
+    TypedHeader(cookie): TypedHeader<Cookie>,
+    ConnectInfo(_client_addr): ConnectInfo<SocketAddr>,
+    PathExtractor((owner, name, branch)): PathExtractor<(String, String, String)>,
+) -> impl IntoResponse {
+    (StatusCode::OK, json!({"empty": true}).to_string()).into_response()
+}
+
+pub async fn get_repo(
+    State(app): State<App>,
+    // This will be needed later:tm:
+    TypedHeader(cookie): TypedHeader<Cookie>,
+    ConnectInfo(_client_addr): ConnectInfo<SocketAddr>,
+    PathExtractor((owner, name)): PathExtractor<(String, String)>,
+) -> impl IntoResponse {
+    let Ok(repo) = app.get_repo_by_on(&owner, &name).await else {
+        return (StatusCode::NOT_FOUND, json!({}).to_string()).into_response();
+    };
+
+    (StatusCode::OK, serde_json::to_string(&repo).unwrap()).into_response()
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateRepoData {
@@ -43,6 +67,7 @@ pub async fn create_repo(
     ConnectInfo(_client_addr): ConnectInfo<SocketAddr>,
     Json(create_repo_data): Json<CreateRepoData>,
 ) -> impl IntoResponse {
+    println!("Ye?");
     let owner = if let Some(session) = cookie.get("session") {
         // get session -> user
         let Ok((session, user)) = app.get_session(session).await else {
@@ -52,11 +77,13 @@ pub async fn create_repo(
     } else {
         // The user is creating an anonymous repo. Some of the checks can be done here!
         if create_repo_data.private || create_repo_data.ttl.is_none() {
+            println!("Ye2?");
             return (StatusCode::FORBIDDEN, json!({}).to_string()).into_response();
         }
         let ttl = create_repo_data.ttl.unwrap();
         let now = Utc::now().timestamp();
         if ttl < now {
+            println!("Ye3?");
             return (StatusCode::FORBIDDEN, json!({}).to_string()).into_response();
         }
         (
@@ -71,6 +98,7 @@ pub async fn create_repo(
     let path = format!("./tests/{}/{}", owner.0, stripped_repo_name);
     let bare_git_repo_path = Path::new(&path);
     if bare_git_repo_path.exists() {
+        println!("Ye4: {path:?}?");
         // Repo exists,c reate better errors omg
         return (StatusCode::FORBIDDEN, json!({}).to_string()).into_response();
     }

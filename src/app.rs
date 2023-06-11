@@ -32,6 +32,10 @@ impl App {
             "repos/create",
             "/home/alfredo/kidney-stones/templates/repos/create.hbs",
         )?;
+        hbs.register_template_file(
+            "repos/view",
+            "/home/alfredo/kidney-stones/templates/repos/view.hbs",
+        )?;
         hbs.register_partial(
             "html_head",
             &std::fs::read_to_string("/home/alfredo/kidney-stones/templates/head.hbs")?,
@@ -74,6 +78,16 @@ impl App {
         let session = self.get_session_by_key(key).await?;
         let accociated_account = self.get_account_by_id(session.owner).await?;
         return Ok((session, accociated_account));
+    }
+
+    pub async fn get_repo_by_on(&self, owner: &str, name: &str) -> Result<Repos> {
+        Ok(sqlx::query_as::<_, Repos>(
+            r#"SELECT * FROM repos WHERE owner_name = ($1) AND name = ($2)"#,
+        )
+        .bind(owner)
+        .bind(name)
+        .fetch_one(&self.db.0)
+        .await?)
     }
 
     pub async fn create_repo(&self, name: &str, owner: i64, owner_name: &str) -> Result<Repos> {

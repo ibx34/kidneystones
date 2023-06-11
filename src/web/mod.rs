@@ -5,7 +5,7 @@ use axum::{
     response::IntoResponse,
     routing::{get, get_service, Router},
 };
-use routes::{get_create_repo, get_home};
+use routes::{get_create_repo, get_home, get_repo};
 use tower_http::services::ServeDir;
 
 use crate::app::App;
@@ -16,5 +16,6 @@ pub fn register_web_routes() -> Router<App> {
             "/repos",
             Router::new().route("/create", get(get_create_repo)),
         )
+        .route("/:owner/:name", get(get_repo))
         .route("/", get(get_home))
 }
