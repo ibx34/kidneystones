@@ -30,7 +30,7 @@ pub async fn get_home(
         "home",
         app.hbs,
         Base {
-            signups_allowed: false,
+            signups_allowed: true,
             user_is_logged_in: cookie.get("logged_in").is_some(),
             nested: Home {
                 name: "ibx34".to_string(),
@@ -56,6 +56,9 @@ pub async fn get_repo(
         }
     };
 
+    let head = git_repo.head().unwrap();
+    let head = head.peel_to_commit().unwrap();
+    let author = head.author();
     let requested_branch = git_repo.find_branch("master", Local).unwrap();
     // let tree = git_repo
     //     .find_object(requested_branch.get().target().unwrap(), Some(Tree))
@@ -90,7 +93,7 @@ pub async fn get_repo(
         "repos/view",
         app.hbs,
         Base {
-            signups_allowed: false,
+            signups_allowed: true,
             user_is_logged_in: cookie.get("logged_in").is_some(),
             nested: json!({
                 "id": repo.id.to_string(),
@@ -100,7 +103,12 @@ pub async fn get_repo(
                     "id": repo.owner,
                     "name": repo.owner_name
                 },
-                "tree": tree
+                "tree": tree,
+                "head": {
+                    "author": author.name(),
+                    "message": head.message(),
+                    "hash": head.id().to_string()
+                }
             }),
         },
     )
@@ -124,7 +132,7 @@ pub async fn get_create_repo(
         "repos/create",
         app.hbs,
         Base {
-            signups_allowed: false,
+            signups_allowed: true,
             user_is_logged_in: cookie.get("logged_in").is_some(),
             nested: ReposCreate { owner: owner_name },
         },

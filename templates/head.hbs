@@ -11,5 +11,33 @@
 <body class="w-screen h-screen overflow-auto flex flex-col font-['Be_vietnam_pro']">
 
     {{>nav}}
+    <dialog id="signupDialog" class="open:max-w-lg open:w-full" onclick="kidneyStones.closeSignupDialog(true)">
+        <form onclick="event.stopPropagation()" class="p-5 flex flex-col gap-4 w-full" action="" target="_self"
+            method="post" onsubmit="{kidneyStones.closeSignupDialog(true); event.preventDefault()}">
+            <header>
+                <h1 class="font-['Be_vietnam_pro'] text-3xl font-semibold">Create Account</h1>
+            </header>
+
+            <ul class="flex flex-col gap-2">
+                <input placeholder="usermame" id="new-account-username" name="new-account-username" type="text"
+                    class="font-sans w-full text-md px-2 py-[0.3rem] border border-transparent focus:border-blue-500 outline-none disabled:cursor-not-allowed disabled:text-gray-500 ring-1 ring-gray-500 focus:ring-blue-500" />
+                <input placeholder="email" id="new-account-email" name="new-account-email" type="email"
+                    class="font-sans w-full text-md px-2 py-[0.3rem] border border-transparent focus:border-blue-500 outline-none disabled:cursor-not-allowed disabled:text-gray-500 ring-1 ring-gray-500 focus:ring-blue-500" />
+                <input placeholder="password" id="new-account-password" name="new-account-password" type="password"
+                    class="font-sans w-full text-md px-2 py-[0.3rem] border border-transparent focus:border-blue-500 outline-none disabled:cursor-not-allowed disabled:text-gray-500 ring-1 ring-gray-500 focus:ring-blue-500" />
+                <input placeholder="repeat password" id="new-account-password-repeated"
+                    name="new-account-password-repeated" type="password"
+                    class="font-sans w-full text-md px-2 py-[0.3rem] border border-transparent focus:border-blue-500 outline-none disabled:cursor-not-allowed disabled:text-gray-500 ring-1 ring-gray-500 focus:ring-blue-500" />
+            </ul>
+
+            <ul class="flex flex-row gap-2">
+                <button
+                    class="font-sans max-w-max tracking-wide text-md bg-blue-500 text-white px-3 py-[0.3rem] transition-all duration-100 hover:bg-blue-400 active:bg-blue-300 active:text-black focus:bg-blue-400 focus:shadow-inner">Create
+                    Account</button>
+                <button onclick="kidneyStones.closeSignupDialog(true)"
+                    class="text-gray-500 hover:text-black">cancel</button>
+            </ul>
+        </form>
+    </dialog>
 
     <main class="justify-center items-center w-full h-full flex flex-col font-['Be_vietnam_pro']">

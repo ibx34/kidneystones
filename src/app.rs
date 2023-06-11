@@ -12,7 +12,9 @@ use crate::{
 };
 use anyhow::Result;
 use axum_template::engine::Engine;
-use handlebars::Handlebars;
+use handlebars::{handlebars_helper, Handlebars};
+
+handlebars_helper!(shortenHash: |hash: String| &hash[0..7]);
 
 #[derive(Clone)]
 pub struct App {
@@ -27,6 +29,7 @@ impl App {
         database.migrate().await.unwrap();
 
         let mut hbs = Handlebars::new();
+        hbs.register_helper("shortenHash", Box::new(shortenHash));
         hbs.register_template_file("home", "/home/alfredo/kidney-stones/templates/home.hbs")?;
         hbs.register_template_file(
             "repos/create",

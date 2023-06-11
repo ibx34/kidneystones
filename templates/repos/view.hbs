@@ -16,8 +16,15 @@
             <a href="{{nested.repo_link}}/issues" class="tab">Issues</a>
         </ul>
     </header>
-    <div class="w-full flex flex-col gap-2 bg-gray-200 text-black rounded-3xl p-3">
-        <ul class="w-full flex flex-col divide-y divide-gray-300">
+    <div class="w-full flex flex-col gap-2 bg-gray-200 text-black rounded-3xl">
+        <header class="bg-gray-300 rounded-t-3xl px-7 py-3 w-full flex flex-row justify-between items-center">
+            <ul class="flex flex-row gap-4">
+                {{nested.head.author}}
+                <span class="text-gray-600">"{{nested.head.message}}"</span>
+            </ul>
+            <a href="/" class="bg-gray-800 text-blue-500 px-2 rounded-lg">{{shortenHash nested.head.hash}}</a>
+        </header>
+        <ul class="p-3 w-full flex flex-col divide-y divide-gray-300">
             {{#each nested.tree}}
             <a href="/" class="px-3 py-1 hover:text-blue-500">{{this.filename}}</a>
             {{/each}}
