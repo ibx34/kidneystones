@@ -55,47 +55,69 @@ pub async fn get_repo(
             return (StatusCode::NOT_FOUND, json!({"1":"!"}).to_string()).into_response();
         }
     };
+    if let (Ok(head), Ok(requested_branch)) =
+        (git_repo.head(), git_repo.find_branch("master", Local))
+    {
+        if let (Ok(tree), Ok(head)) = (requested_branch.get().peel_to_tree(), head.peel_to_commit())
+        {
+            if !tree.is_empty() {
+                let author = head.author();
+                let tree = tree
+                    .iter()
+                    .map(|e: git2::TreeEntry<'_>| {
+                        let file = e.to_object(&git_repo).unwrap();
+                        println!("1: {:?}", file.kind());
+                        let file_size = if let Some(blob) = file.as_blob() {
+                            println!("{:?}", blob.clone().into_object().peel_to_commit());
+                            blob.content().to_vec().len()
+                        } else {
+                            0
+                        };
+                        return RepoFile {
+                            filename: e.name().unwrap().to_string(),
+                            hash: file.id().to_string(),
+                            dir: file.as_tree().is_some(),
+                        };
+                    })
+                    .collect::<Vec<RepoFile>>();
 
-    let head = git_repo.head().unwrap();
-    let head = head.peel_to_commit().unwrap();
-    let author = head.author();
-    let requested_branch = git_repo.find_branch("master", Local).unwrap();
-    // let tree = git_repo
-    //     .find_object(requested_branch.get().target().unwrap(), Some(Tree))
-    //     .unwrap();
-
-    // let tree = tree.as_tree().unwrap();
-    let tree = requested_branch.get().peel_to_tree().unwrap();
-    if tree.is_empty() {
-        return (StatusCode::OK, json!({"empty": true}).to_string()).into_response();
+                return RenderHtml(
+                    "repos/view",
+                    app.hbs,
+                    Base {
+                        signups_allowed: true,
+                        user_is_logged_in: cookie.get("logged_in").is_some(),
+                        nested: json!({
+                            "empty": false,
+                            "id": repo.id.to_string(),
+                            "name": repo.name,
+                            "repo_link": format!("{}/{}", repo.owner_name, repo.name),
+                            "owner": {
+                                "id": repo.owner,
+                                "name": repo.owner_name
+                            },
+                            "tree": tree,
+                            "head": {
+                                "author": author.name(),
+                                "message": head.message(),
+                                "hash": head.id().to_string()
+                            }
+                        }),
+                    },
+                )
+                .into_response();
+            }
+        }
     }
 
-    let tree = tree
-        .iter()
-        .map(|e: git2::TreeEntry<'_>| {
-            let file = e.to_object(&git_repo).unwrap();
-            println!("1: {:?}", file.kind());
-            let file_size = if let Some(blob) = file.as_blob() {
-                println!("{:?}", blob.clone().into_object().peel_to_commit());
-                blob.content().to_vec().len()
-            } else {
-                0
-            };
-            return RepoFile {
-                filename: e.name().unwrap().to_string(),
-                hash: file.id().to_string(),
-                size: file_size,
-            };
-        })
-        .collect::<Vec<RepoFile>>();
-
-    RenderHtml(
+    return RenderHtml(
         "repos/view",
         app.hbs,
         Base {
             signups_allowed: true,
             user_is_logged_in: cookie.get("logged_in").is_some(),
             nested: json!({
+                "empty": true,
                 "id": repo.id.to_string(),
                 "name": repo.name,
                 "repo_link": format!("{}/{}", repo.owner_name, repo.name),
@@ -103,16 +125,10 @@ pub async fn get_repo(
                     "id": repo.owner,
                     "name": repo.owner_name
                 },
-                "tree": tree,
-                "head": {
-                    "author": author.name(),
-                    "message": head.message(),
-                    "hash": head.id().to_string()
-                }
             }),
         },
     )
-    .into_response()
+    .into_response();
 }
 
 pub async fn get_create_repo(

@@ -1,12 +1,6 @@
-// use std::{
-//     cmp::max,
-//     collections::HashMap,
-//     path::{Path, PathBuf},
-// };
-
-// use git2::{BranchType::Local, DiffOptions, Oid, Repository, Tree};
-
-use crate::models::RepoFile;
+use git2::{
+    Blob, BranchType::Local, DescribeOptions, DiffDelta, DiffOptions, Oid, Repository, Tree,
+};
 
 mod app;
 mod config;
@@ -17,6 +11,7 @@ mod web;
 
 use crate::{
     app::App,
+    models::RepoFile,
     routes::{
         git::{info_refs, recieve_pack, upload_pack},
         repos::{create_repo, get_repo, get_repo_tree},
@@ -24,120 +19,53 @@ use crate::{
     web::register_web_routes,
 };
 
-// fn get_file_or_tree_owner(repo: &Repository, files: Vec<(Oid, RepoFile)>) {
-//     // filename: (Parent, File)
-//     let mut parents_and_chidlren: HashMap<&str, (Oid, Oid)> = HashMap::new();
-//     for file in &files {
-//         let mut revwalk = repo.revwalk().unwrap();
-//         revwalk.set_sorting(git2::Sort::TIME).unwrap();
+// fn get_file_or_tree_latest_commit(
+//     repo: &Repository,
+//     commit: Option<Oid>,
+//     file: BlobOrTree<'_>,
+// ) -> Option<(String, Oid)> {
+//     let mut revwalk = repo.revwalk().unwrap();
+//     revwalk.set_sorting(git2::Sort::TIME).unwrap();
+//     revwalk.push_head().unwrap();
+//     if let Some(oid) = commit {
+//         revwalk.push(oid).unwrap();
+//     } else {
 //         revwalk.push_head().unwrap();
+//     }
+//     for commit_id in revwalk {
+//         let commit_id = commit_id.unwrap();
 
-//         for commit_id in revwalk {
-//             let commit_id = commit_id.unwrap();
-//             // println!("LOOKING AT COMMIT {commit_id:?}\n\n");
-//             // println!("Checking Commit: {:?}", commit_id);
-//             // if commits_to_check.contains(&commit_id) {
-//             //     println!("Tree contains: {:?}", commit_id);
-//             let commit = repo.find_commit(commit_id).unwrap();
-//             let prev_tree = if commit.parent_count() > 0 {
-//                 let prev_commit = commit.parent(0).unwrap();
-//                 Some(prev_commit.tree().unwrap())
-//             } else {
-//                 None
-//             };
+//         let commit = repo.find_commit(commit_id).unwrap();
+//         let prev_tree = if let Ok(prev_commit) = commit.parent(0) {
+//             Some(prev_commit.tree().unwrap())
+//         } else {
+//             None
+//         };
+//         let tree = commit.tree().unwrap();
 
-//             let tree = commit.tree().unwrap();
-//             // let prev_tree = prev_commit.tree().unwrap();
+//         let diff = repo
+//             .diff_tree_to_tree(prev_tree.as_ref(), Some(&tree), None)
+//             .unwrap();
 
-//             let mut opts = DiffOptions::new();
-//             let diff = repo
-//                 .diff_tree_to_tree(prev_tree.as_ref(), Some(&tree), Some(&mut opts))
-//                 .unwrap();
+//         let mut deltas = diff.deltas();
 
-//             let mut deltas = diff.deltas();
-
-//             let file_name = file.1.filename.clone();
-//             let contains = deltas.any(|dd| {
-//                 let new_file_path = dd.new_file().path().unwrap();
-//                 // File || Dir
-//                 new_file_path.eq(Path::new(&file_name)) || new_file_path.starts_with(&file_name)
-//             });
-
-//             if contains {
-//                 if parents_and_chidlren.get(file.1.filename.as_str()).is_none() {
-//                     parents_and_chidlren.insert(&file.1.filename, (commit.id(), file.0));
-//                 }
-//                 // println!(
-//                 //     "Parent of file \"{:?}\" ({:?}) is {:?}",
-//                 //     file_path.0,
-//                 //     file_path.1,
-//                 //     commit.id()
-//                 // );
-//             }
+//         let contains = deltas.any(|dd| {
+//             let new_file = dd.new_file();
+//             let new_file_path = new_file.path().unwrap();
+//             new_file_path.eq(Path::new(&file.name))
+//                 || new_file_path.starts_with(&file.name)
+//                 || file.__inner.id() == new_file.id()
+//         });
+//         if contains {
+//             return Some((file.name.to_string(), commit.id()));
 //         }
 //     }
-//     println!("{parents_and_chidlren:#?}");
-//     //     // Ignore merge commits (2+ parents) because that's what 'git whatchanged' does.
-//     //     // Ignore commit with 0 parents (initial commit) because there's nothing to diff against
-//     //     if commit.parent_count() == 1 {
-//     //         let prev_commit = commit.parent(0).unwrap();
-//     //         println!("{:?} belongs to {:?}", commit_id, prev_commit.id());
-//     //         // let tree = commit.tree().unwrap();
-//     //         // let prev_tree = prev_commit.tree().unwrap();
-//     //         // let diff = repo
-//     //         //     .diff_tree_to_tree(Some(&prev_tree), Some(&tree), None)
-//     //         //     .unwrap();
-//     //         // for delta in diff.deltas() {
-//     //         //     let file_path = delta.new_file().path().unwrap();
-//     //         //     let file_mod_time = commit.time();
-//     //         //     let unix_time = file_mod_time.seconds();
-//     //         //     mtimes
-//     //         //         .entry(file_path.to_owned())
-//     //         //         .and_modify(|t| *t = max(*t, unix_time))
-//     //         //         .or_insert(unix_time);
-//     //         // }
-//     //     }
-//     // }
-// }
 
-// fn main() {
-//     let git_repo = match Repository::open_bare("./tests/ibx34/why-no-work") {
-//         Ok(repo) => repo,
-//         Err(err) => {
-//             panic!("{err:?}");
-//         }
-//     };
-//     let requested_branch = git_repo.find_branch("master", Local).unwrap();
-
-//     let _tree = requested_branch.get().peel_to_tree().unwrap();
-
-//     let tree = _tree
-//         .iter()
-//         .map_while(|e: git2::TreeEntry<'_>| {
-//             let file = e.to_object(&git_repo).unwrap();
-//             if let Some(blob) = file.as_blob() {
-//                 println!("1: {:?}", file.kind());
-
-//                 println!("Name: {:?}", e.name());
-//                 return Some((
-//                     blob.id(),
-//                     RepoFile {
-//                         filename: e.name().unwrap().to_string(),
-//                         hash: file.id().to_string(),
-//                         size: blob.content().to_vec().len(),
-//                     },
-//                 ));
-//             }
-//             None
-//         })
-//         .collect::<Vec<(Oid, RepoFile)>>();
-
-//     get_file_or_tree_owner(&git_repo, tree);
+//     None
 // }
 
 use anyhow::Result;
 use axum::{
-    extract::Path,
     response::{Html, IntoResponse},
     // middleware::from_fn_with_state,
     routing::{get, get_service, post},
@@ -145,15 +73,104 @@ use axum::{
 };
 use axum_extra::body::AsyncReadBody;
 use reqwest::StatusCode;
-use std::net::SocketAddr;
+use std::{
+    boxed::Box,
+    cmp::max,
+    collections::HashMap,
+    net::SocketAddr,
+    path::{Path, PathBuf},
+};
 use tower_http::{services::ServeDir, trace::TraceLayer};
+
+// #[derive(Debug, Clone)]
+// pub enum BlobOrTree2<'a> {
+//     Blob(Blob<'a>),
+//     Tree(Vec<Box<BlobOrTree<'a>>>),
+// }
+
+// impl<'a> BlobOrTree2<'a> {
+//     pub fn id(&self) -> Oid {
+//         match self {
+//             BlobOrTree2::Blob(b) => b.id(),
+//             BlobOrTree2::Tree(_) => unreachable!(),
+//         }
+//     }
+// }
+
+// #[derive(Debug, Clone)]
+// pub struct BlobOrTree<'a> {
+//     pub __inner: BlobOrTree2<'a>,
+//     pub name: String,
+// }
+
+// fn handle_tree<'a>(repo: &'a Repository, tree: Tree<'a>) -> Vec<BlobOrTree<'a>> {
+//     tree.into_iter()
+//         .map_while(|tree_entry| {
+//             let git_obj = tree_entry.to_object(&repo).unwrap();
+
+//             match git_obj.kind() {
+//                 Some(git2::ObjectType::Blob) => {
+//                     let b = git_obj.as_blob()?;
+//                     Some(BlobOrTree {
+//                         __inner: BlobOrTree2::Blob(b.clone()),
+//                         name: tree_entry.name().unwrap_or("").to_string(),
+//                     })
+//                 }
+//                 Some(git2::ObjectType::Tree) => {
+//                     let tree = git_obj.as_tree()?;
+//                     let boxed_tree = handle_tree(&repo, tree.clone())
+//                         .into_iter()
+//                         .map(|e| Box::new(e))
+//                         .collect::<Vec<Box<BlobOrTree<'_>>>>();
+//                     Some(BlobOrTree {
+//                         __inner: BlobOrTree2::Tree(boxed_tree),
+//                         name: tree_entry.name().unwrap_or("").to_string(),
+//                     })
+//                 }
+//                 _ => panic!("Unkown object type."),
+//             }
+//         })
+//         .collect::<Vec<BlobOrTree<'_>>>()
+// }
+
+// fn print_tree_commits(repo: &Repository, tree: Vec<BlobOrTree<'_>>) {
+//     for e in tree {
+//         match e.__inner {
+//             BlobOrTree2::Blob(_) => {
+//                 println!("* {:?}", get_file_or_tree_latest_commit(&repo, None, e))
+//             }
+//             BlobOrTree2::Tree(tree) => print_tree_commits(
+//                 &repo,
+//                 tree.into_iter()
+//                     .map(|boxed| *boxed)
+//                     .collect::<Vec<BlobOrTree<'_>>>(),
+//             ),
+//         }
+//     }
+// }
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::INFO)
-        .pretty()
-        .init();
+    println!("Getting test repo files and inserting commits.");
+    let git_repo = match Repository::open_bare("./tests/ibx34/why-no-work") {
+        Ok(repo) => repo,
+        Err(err) => {
+            panic!("{err:?}");
+        }
+    };
+    println!("Repo HEAD --> {:?}", git_repo.head().unwrap().target());
+    let requested_branch = git_repo.find_branch("master", Local).unwrap();
+
+    let _tree = requested_branch.get().peel_to_tree().unwrap();
+
+    // let tree = handle_tree(&git_repo, _tree);
+    // print_tree_commits(&git_repo, tree);
+    // let files_and_parents = get_file_or_tree_owner(&git_repo, None, tree);
+
+    // tracing_subscriber::fmt()
+    //     .with_max_level(tracing::Level::INFO)
+    //     .pretty()
+    //     .init();
 
     let app = App::init().await?;
     // throw the result away, we dont care.

@@ -5,6 +5,12 @@
 
 <div class="w-full h-full flex flex-col gap-4 p-5 max-w-3xl">
     <header class="flex flex-col gap-4">
+        <div class="p-5 bg-blue-100 rounded-3xl flex flex-col gap-2">
+            <h5 class="text-blue-500 font-semibold text-lg">Anonymous Repo</h5>
+            <p>This instance is not affiliated with any contents of this repo. Anyone can create anonymous repos, even
+                if not logged in.</p>
+        </div>
+
         <div class="flex flex-row gap-2 items-end">
             <h1 class="font-['Be_vietnam_pro'] text-3xl font-semibold">{{nested.owner.name}}/{{nested.name}}</h1>
             <button id="repos-view-copy-repo-id" onclick="kidneyStones.copyTextToClipboard(event, '{{nested.id}}')"
@@ -13,23 +19,44 @@
         </div>
         <ul class="flex flex-row gap-2 border-b border-b-gray-500">
             <a href="{{nested.repo_link}}" class="tab active">Code</a>
-            <a href="{{nested.repo_link}}/issues" class="tab">Issues</a>
+            <a href="/{{nested.repo_link}}/issues" class="tab">Issues</a>
         </ul>
     </header>
-    <div class="w-full flex flex-col gap-2 bg-gray-200 text-black rounded-3xl">
-        <header class="bg-gray-300 rounded-t-3xl px-7 py-3 w-full flex flex-row justify-between items-center">
+    {{#if nested.empty}}
+    <div class="w-full flex flex-col gap-2">
+        <header class="flex flex-col gap-2">
+            <h1 class="font-['Be_vietnam_pro'] text-xl font-semibold">Get started!</h1>
+            <p>To get started you shoul add this repo to your git project. <button
+                    onclick="kidneyStones.copyTextToClipboard(event, 'http://localhost:8080/api/{{nested.repo_link}}.git')"
+                    class="block border border-gray-800 bg-gray-400 text-black px-1 transition-all duration-100 hover:bg-gray-800 hover:text-blue-500">git
+                    remote add origin master
+                    http://localhost:8080/api/{{nested.repo_link}}.git</button></p>
+        </header>
+        <img src="/assets/itempty.png" />
+    </div>
+    {{else}}
+    <div class="w-full flex flex-col gap-2 bg-gray-200 text-black border border-gray-300">
+        <header class="bg-gray-300 px-7 py-3 w-full flex flex-row justify-between items-center">
             <ul class="flex flex-row gap-4">
                 {{nested.head.author}}
                 <span class="text-gray-600">"{{nested.head.message}}"</span>
             </ul>
-            <a href="/" class="bg-gray-800 text-blue-500 px-2 rounded-lg">{{shortenHash nested.head.hash}}</a>
+            <a href="/"
+                class="border border-gray-800 bg-gray-400 text-black px-1 transition-all duration-100 hover:bg-gray-800 hover:text-blue-500">{{shortenHash
+                nested.head.hash}}</a>
         </header>
         <ul class="p-3 w-full flex flex-col divide-y divide-gray-300">
             {{#each nested.tree}}
-            <a href="/" class="px-3 py-1 hover:text-blue-500">{{this.filename}}</a>
+            <a href="/" class="px-3 py-1 hover:text-blue-500">
+                {{#if this.dir}}
+                <span class="text-xl text-gray-600">/</span>
+                {{/if}}
+                {{this.filename}}
+            </a>
             {{/each}}
         </ul>
     </div>
+    {{/if}}
 </div>
 
 {{>html_tail}}

@@ -4,8 +4,8 @@ use sqlx::FromRow;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct RepoFile {
     pub filename: String,
-    pub size: usize,
     pub hash: String,
+    pub dir: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
