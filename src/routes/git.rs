@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tokio::{io::AsyncWriteExt, process::Command};
 
-const MAX_SIZE: usize = 262_144;
+const MAX_SIZE: usize = 524288000;
 
 pub fn strip_dot_git_from_repo_name(n: String) -> Result<String, impl IntoResponse> {
     let repo_name_split = n.split(".");
@@ -61,7 +61,7 @@ pub async fn info_refs(
     let repo_name = strip_dot_git_from_repo_name(repo)
         .map_err(|e| return e.into_response())
         .unwrap();
-    let repo_path = &format!("./tests/{}/{}", user, repo_name);
+    let repo_path = &format!("/home/alfredo/kidney-stones/tests/{}/{}", user, repo_name);
     println!("Path3: {repo_path:?}");
     match Repository::open_bare(repo_path) {
         Ok(repo) => repo,
@@ -115,42 +115,47 @@ pub async fn recieve_pack(
     let repo_name = strip_dot_git_from_repo_name(repo)
         .map_err(|e| return e.into_response())
         .unwrap();
-    let repo_path = &format!("./tests/{}/{}", user, repo_name);
+    let repo_path = &format!("/home/alfredo/kidney-stones/tests/{}/{}", user, repo_name);
     println!("Path2: {repo_path:?}");
     match Repository::open_bare(repo_path) {
         Ok(repo) => repo,
         Err(_) => return (StatusCode::NOT_FOUND, headers, json!({}).to_string()).into_response(),
     };
-
+    println!("1");
     let mut body = Vec::new();
+    println!("2");
     while let Some(chunk) = payload.next().await {
+        println!("3");
         let chunk = chunk.unwrap();
         // limit max size of in-memory payload
         if (body.len() + chunk.len()) > MAX_SIZE {
+            println!("TOO BIG");
             return (StatusCode::BAD_REQUEST, headers, json!({}).to_string()).into_response();
         }
         body.extend_from_slice(&chunk);
     }
 
     let mut buffer = Vec::new();
-
+    println!("4");
     let mut child = Command::new("git")
-        .current_dir(repo_path)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
-        .args(&["receive-pack", "--stateless-rpc", "."])
+        .env("SSH_ORIGINAL_COMMAND", "receive-pack")
+        .args(&["receive-pack", "--stateless-rpc", repo_path])
         .spawn()
         .expect("failed to spawn");
-
+    println!("5");
     let mut stdin = child.stdin.take().expect("Failed to open stdin");
+    println!("6");
     stdin.write(&body).await.unwrap();
-
+    println!("7");
     let output = child
         .wait_with_output()
         .await
         .expect("Failed to read stdout");
+    println!("8");
     std::io::Write::write_all(&mut buffer, &output.stdout).unwrap();
-
+    println!("9");
     headers.insert(
         CONTENT_TYPE,
         format!("application/x-{}-result", "git-receive-pack")
@@ -169,7 +174,7 @@ pub async fn upload_pack(
     let repo_name = strip_dot_git_from_repo_name(repo)
         .map_err(|e| return e.into_response())
         .unwrap();
-    let repo_path = &format!("./tests/{}/{}", user, repo_name);
+    let repo_path = &format!("/home/alfredo/kidney-stones/tests/{}/{}", user, repo_name);
     println!("Path1: {repo_path:?}");
     match Repository::open_bare(repo_path) {
         Ok(repo) => repo,
