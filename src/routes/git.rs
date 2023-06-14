@@ -143,6 +143,7 @@ pub async fn recieve_pack(
         .env("SSH_ORIGINAL_COMMAND", "receive-pack")
         .env("GIT_TRACE", "1")
         .env("GIT_TRACE_PACKET", "1")
+        .env("GIT_CURL_VERBOSE", "1")
         .args(&["receive-pack", "--stateless-rpc", repo_path])
         .spawn()
         .expect("failed to spawn");
