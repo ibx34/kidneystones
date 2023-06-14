@@ -121,11 +121,8 @@ pub async fn recieve_pack(
         Ok(repo) => repo,
         Err(_) => return (StatusCode::NOT_FOUND, headers, json!({}).to_string()).into_response(),
     };
-    println!("1");
     let mut body = Vec::new();
-    println!("2");
     while let Some(chunk) = payload.next().await {
-        println!("3");
         let chunk = chunk.unwrap();
         // limit max size of in-memory payload
         if (body.len() + chunk.len()) > MAX_SIZE {
@@ -136,7 +133,6 @@ pub async fn recieve_pack(
     }
 
     let mut buffer = Vec::new();
-    println!("4");
     let mut child = Command::new("git")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -147,18 +143,13 @@ pub async fn recieve_pack(
         .args(&["receive-pack", "--stateless-rpc", repo_path])
         .spawn()
         .expect("failed to spawn");
-    println!("5");
     let mut stdin = child.stdin.take().expect("Failed to open stdin");
-    println!("6");
     stdin.write_all(&body).await.unwrap();
-    println!("7");
     let output = child
         .wait_with_output()
         .await
         .expect("Failed to read stdout");
-    println!("8");
     std::io::Write::write_all(&mut buffer, &output.stdout).unwrap();
-    println!("9");
     headers.insert(
         CONTENT_TYPE,
         format!("application/x-{}-result", "git-receive-pack")
@@ -166,7 +157,7 @@ pub async fn recieve_pack(
             .unwrap(),
     );
 
-    (StatusCode::OK, headers).into_response()
+    (StatusCode::OK, headers, buffer).into_response()
 }
 
 pub async fn upload_pack(
