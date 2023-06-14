@@ -141,13 +141,15 @@ pub async fn recieve_pack(
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .env("SSH_ORIGINAL_COMMAND", "receive-pack")
+        .env("GIT_TRACE", "1")
+        .env("GIT_TRACE_PACKET", "1")
         .args(&["receive-pack", "--stateless-rpc", repo_path])
         .spawn()
         .expect("failed to spawn");
     println!("5");
     let mut stdin = child.stdin.take().expect("Failed to open stdin");
     println!("6");
-    stdin.write(&body).await.unwrap();
+    stdin.write_all(&body).await.unwrap();
     println!("7");
     let output = child
         .wait_with_output()
